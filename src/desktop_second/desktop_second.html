@@ -5,25 +5,412 @@
   <meta charset="UTF-8" />
   <link rel="stylesheet" href="../../css/general.css" />
   <link rel="stylesheet" href="../../css/header.css" />
-  <title>Tempo League - Desktop Second</title>
+  <title>Tempo League</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+    :root {
+      --bg-deep: #0a0a0f;
+      --bg-surface: #111118;
+      --accent-core: #e8364f;
+      --accent-glow: #ff4d6a;
+      --accent-dim: #7a1d2e;
+      --text-primary: #e8e6f0;
+      --text-muted: #5a586a;
+      --text-dim: #3a3848;
+      --ring-idle: rgba(232, 54, 79, 0.06);
+      --ring-pulse: rgba(232, 54, 79, 0.25);
+      --beat-duration: 1s;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg-deep);
+      font-family: 'Outfit', sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-header {
+      flex-shrink: 0;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-height: 0;
+    }
+
+    /* ---- Tempo content (orb + readout) ---- */
+    .tempo-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+    }
+
+    /* ---- Ad container ---- */
+    .ad-section {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .ad-container {
+      width: 400px;
+      height: 300px;
+      background: var(--bg-surface);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .ad-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 300;
+      color: var(--text-dim);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-right: 4px;
+    }
+
+    /* ---- Background grain texture ---- */
+    main::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ---- Orb container ---- */
+    .tempo-orb-wrap {
+      position: relative;
+      width: 320px;
+      height: 320px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+    }
+
+    /* ---- Outer rings ---- */
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid var(--ring-idle);
+      transition: border-color 0.3s ease;
+    }
+
+    .ring--1 { width: 320px; height: 320px; }
+    .ring--2 { width: 270px; height: 270px; }
+    .ring--3 { width: 220px; height: 220px; }
+
+    .beating .ring {
+      animation: ring-breathe var(--beat-duration) ease-out infinite;
+    }
+
+    .beating .ring--2 { animation-delay: 0.04s; }
+    .beating .ring--3 { animation-delay: 0.08s; }
+
+    @keyframes ring-breathe {
+      0%   { border-color: var(--ring-pulse); transform: scale(1.03); }
+      30%  { border-color: var(--ring-idle); transform: scale(1); }
+      100% { border-color: var(--ring-idle); transform: scale(1); }
+    }
+
+    /* ---- Core orb ---- */
+    .orb {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%,
+        var(--accent-glow) 0%,
+        var(--accent-core) 40%,
+        var(--accent-dim) 100%
+      );
+      box-shadow:
+        0 0 60px rgba(232, 54, 79, 0.15),
+        0 0 120px rgba(232, 54, 79, 0.05),
+        inset 0 -8px 24px rgba(0, 0, 0, 0.4);
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Specular highlight */
+    .orb::before {
+      content: '';
+      position: absolute;
+      top: 18%;
+      left: 24%;
+      width: 36%;
+      height: 28%;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(255,255,255,0.25) 0%, transparent 70%);
+    }
+
+    .beating .orb {
+      animation: orb-pulse var(--beat-duration) ease-out infinite;
+    }
+
+    @keyframes orb-pulse {
+      0%   {
+        transform: scale(1.12);
+        box-shadow:
+          0 0 80px rgba(232, 54, 79, 0.4),
+          0 0 160px rgba(232, 54, 79, 0.15),
+          inset 0 -8px 24px rgba(0, 0, 0, 0.4);
+      }
+      15%  {
+        transform: scale(1.0);
+        box-shadow:
+          0 0 60px rgba(232, 54, 79, 0.2),
+          0 0 120px rgba(232, 54, 79, 0.06),
+          inset 0 -8px 24px rgba(0, 0, 0, 0.4);
+      }
+      100% {
+        transform: scale(1.0);
+        box-shadow:
+          0 0 60px rgba(232, 54, 79, 0.15),
+          0 0 120px rgba(232, 54, 79, 0.05),
+          inset 0 -8px 24px rgba(0, 0, 0, 0.4);
+      }
+    }
+
+    /* ---- Flash overlay on beat ---- */
+    .orb::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%);
+      opacity: 0;
+    }
+
+    .beating .orb::after {
+      animation: orb-flash var(--beat-duration) ease-out infinite;
+    }
+
+    @keyframes orb-flash {
+      0%   { opacity: 1; }
+      20%  { opacity: 0; }
+      100% { opacity: 0; }
+    }
+
+    /* ---- Data readout ---- */
+    .readout {
+      z-index: 1;
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .readout__bpm {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 56px;
+      font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+
+    .readout__bpm-unit {
+      font-size: 16px;
+      font-weight: 300;
+      color: var(--text-muted);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-left: 4px;
+    }
+
+    .readout__champion {
+      font-size: 18px;
+      font-weight: 300;
+      color: var(--text-muted);
+      margin-top: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .readout__champion-name {
+      color: var(--text-primary);
+      font-weight: 400;
+    }
+
+    .readout__as {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--text-dim);
+      margin-top: 6px;
+      letter-spacing: 1px;
+    }
+
+    /* ---- Waiting state ---- */
+    .waiting-state {
+      z-index: 1;
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .waiting-state__label {
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--text-dim);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .waiting-state .dot-pulse {
+      display: inline-block;
+      animation: dot-blink 1.4s infinite steps(1);
+    }
+    .waiting-state .dot-pulse:nth-child(2) { animation-delay: 0.2s; }
+    .waiting-state .dot-pulse:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes dot-blink {
+      0%, 50% { opacity: 0; }
+      25%     { opacity: 1; }
+    }
+
+    /* ---- Tick markers around orb ---- */
+    .tick-ring {
+      position: absolute;
+      width: 320px;
+      height: 320px;
+    }
+
+    .tick {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 1px;
+      height: 8px;
+      background: var(--text-dim);
+      transform-origin: 0 160px;
+      opacity: 0.4;
+    }
+
+    .tick--major {
+      height: 14px;
+      width: 2px;
+      opacity: 0.6;
+      background: var(--text-muted);
+    }
+
+    /* ---- Utility ---- */
+    .hidden { display: none !important; }
+  </style>
 </head>
 
 <body>
   <!-- -------------------------------- Header ------------------------------- -->
-
   <header id="header" class="app-header">
     <img src="../../img/header_icon.svg" />
-    <h1>Tempo League / Desktop Second</h1>
+    <h1>Tempo League</h1>
     <div class="window-controls-group">
-      <button id="minimizeButton" class="window-control window-control-minimize" />
-      <button id="maximizeButton" class="window-control window-control-maximize" />
-      <button id="closeButton" class="window-control window-control-close" />
+      <button id="minimizeButton" class="window-control window-control-minimize"></button>
+      <button id="maximizeButton" class="window-control window-control-maximize"></button>
+      <button id="closeButton" class="window-control window-control-close"></button>
     </div>
   </header>
 
   <!-- --------------------------------- Main -------------------------------- -->
   <main>
+    <div class="tempo-content">
+      <div class="tempo-orb-wrap" id="orbWrap">
+        <!-- Tick marks generated by JS -->
+        <div class="tick-ring" id="tickRing"></div>
+        <div class="ring ring--1"></div>
+        <div class="ring ring--2"></div>
+        <div class="ring ring--3"></div>
+        <div class="orb" id="orb"></div>
+      </div>
+
+      <!-- Active: show BPM data -->
+      <div class="readout hidden" id="readout">
+        <div>
+          <span class="readout__bpm" id="bpmValue">—</span>
+          <span class="readout__bpm-unit">bpm</span>
+        </div>
+        <div class="readout__champion">
+          <span class="readout__champion-name" id="champName">—</span>
+        </div>
+        <div class="readout__as">
+          AS <span id="asValue">—</span>
+        </div>
+      </div>
+
+      <!-- Idle: waiting for champ data -->
+      <div class="waiting-state" id="waitingState">
+        <span class="waiting-state__label">
+          awaiting champion
+          <span class="dot-pulse">.</span><span class="dot-pulse">.</span><span class="dot-pulse">.</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Ad space -->
+    <div class="ad-section">
+      <div class="ad-container" id="ad-container"></div>
+      <span class="ad-label">sponsored</span>
+    </div>
   </main>
+
+  <script src="https://content.overwolf.com/libs/ads/latest/owads.min.js" async
+    onerror="onAdsSDKNotLoaded()" onload="onAdsSDKReady()"></script>
+  <script>
+    function onAdsSDKNotLoaded() {
+      console.error("Couldn't load owads.min.js");
+    }
+
+    function onAdsSDKReady() {
+      if (typeof OwAd === 'undefined') {
+        console.error("Overwolf Ads SDK not available");
+        return;
+      }
+
+      var ad = new OwAd(document.getElementById("ad-container"), {
+        size: { width: 400, height: 300 },
+        containerId: "tempo_league_400x300_desktop_second"
+      });
+
+      ad.addEventListener("player_loaded", function () {
+        console.log("Ad player loaded");
+      });
+
+      ad.addEventListener("error", function (e) {
+        console.error("Ad error:", e);
+      });
+    }
+
+    // Generate tick marks around the orb
+    (function () {
+      const ring = document.getElementById('tickRing');
+      const count = 60;
+      for (let i = 0; i < count; i++) {
+        const tick = document.createElement('div');
+        const angle = (360 / count) * i;
+        const isMajor = i % 15 === 0;
+        tick.className = 'tick' + (isMajor ? ' tick--major' : '');
+        tick.style.transform = 'rotate(' + angle + 'deg)';
+        ring.appendChild(tick);
+      }
+    })();
+  </script>
 </body>
 
 </html>

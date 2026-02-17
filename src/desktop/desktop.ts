@@ -71,6 +71,16 @@ class Desktop extends AppWindow {
 					? `${champ.name} - AS: ${champ.attackSpeed}`
 					: String(championId);
 				this.logLine(this._eventsLog, display, false);
+
+				if (champ) {
+					localStorage.setItem(
+						"tempo_champion",
+						JSON.stringify({
+							name: champ.name,
+							attackSpeed: champ.attackSpeed,
+						}),
+					);
+				}
 			}
 		} catch (e) {
 			console.error("Failed to parse champ_select raw:", e);
