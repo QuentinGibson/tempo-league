@@ -8,11 +8,23 @@ class Desktop extends AppWindow {
 	private _championMap: Map<number, { name: string; attackSpeed: number }> =
 		new Map();
 
+	// UI elements
+	private _championWaiting: HTMLElement;
+	private _championDetected: HTMLElement;
+	private _champDisplayName: HTMLElement;
+	private _champDisplayBpm: HTMLElement;
+	private _champDisplayAs: HTMLElement;
+
 	private constructor() {
 		super(kWindowNames.desktop);
 
 		this._eventsLog = document.getElementById("eventsLog");
 		this._infoLog = document.getElementById("infoLog");
+		this._championWaiting = document.getElementById("championWaiting");
+		this._championDetected = document.getElementById("championDetected");
+		this._champDisplayName = document.getElementById("champDisplayName");
+		this._champDisplayBpm = document.getElementById("champDisplayBpm");
+		this._champDisplayAs = document.getElementById("champDisplayAs");
 	}
 
 	public static instance() {
@@ -57,6 +69,7 @@ class Desktop extends AppWindow {
 		if (!info.info?.champ_select?.raw) {
 			// Champ select data cleared — user left lobby
 			localStorage.removeItem("tempo_champion");
+			this.showWaitingState();
 			return;
 		}
 
@@ -82,11 +95,26 @@ class Desktop extends AppWindow {
 							attackSpeed: champ.attackSpeed,
 						}),
 					);
+					this.showChampion(champ.name, champ.attackSpeed);
 				}
 			}
 		} catch (e) {
 			console.error("Failed to parse champ_select raw:", e);
 		}
+	}
+
+	private showChampion(name: string, attackSpeed: number) {
+		const bpm = Math.round(attackSpeed * 60);
+		this._champDisplayName.textContent = name;
+		this._champDisplayBpm.textContent = String(bpm);
+		this._champDisplayAs.textContent = attackSpeed.toFixed(3);
+		this._championWaiting.classList.add("hidden");
+		this._championDetected.classList.add("visible");
+	}
+
+	private showWaitingState() {
+		this._championDetected.classList.remove("visible");
+		this._championWaiting.classList.remove("hidden");
 	}
 
 	private onNewEvents() {}
