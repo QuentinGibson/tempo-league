@@ -245,23 +245,26 @@ class DesktopSecond extends AppWindow {
 	private applyAnimeScale(scale: number) {
 		this._animeScaleSlider.value = String(scale);
 		this._animeScaleValue.textContent = `${scale}%`;
-		this._animeCharacter.style.transform = this.getAnimeTransform(scale);
+		this._animeCharImg.style.transform = this.getAnimeImgTransform();
 	}
 
 	private applyAnimeOffsetX(x: number) {
 		this._animeOffsetXSlider.value = String(x);
 		this._animeOffsetXValue.textContent = String(x);
-		this._animeCharImg.style.marginLeft = `${x}px`;
+		this._animeCharImg.style.transform = this.getAnimeImgTransform();
 	}
 
 	private applyAnimeOffsetY(y: number) {
 		this._animeOffsetYSlider.value = String(y);
 		this._animeOffsetYValue.textContent = String(y);
-		this._animeCharImg.style.marginTop = `${y}px`;
+		this._animeCharImg.style.transform = this.getAnimeImgTransform();
 	}
 
-	private getAnimeTransform(scale: number): string {
-		return `scale(${scale / 100})`;
+	private getAnimeImgTransform(): string {
+		const scale = parseInt(this._animeScaleSlider.value, 10) / 100;
+		const x = parseInt(this._animeOffsetXSlider.value, 10);
+		const y = parseInt(this._animeOffsetYSlider.value, 10);
+		return `scale(${scale}) translate(${x}px, ${y}px)`;
 	}
 
 	private applyColor(core: string, glow: string, dim: string) {

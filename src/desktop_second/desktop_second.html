@@ -505,6 +505,11 @@
       object-fit: contain;
       user-select: none;
       pointer-events: none;
+      transition: transform 0.1s ease;
+    }
+
+    .anime-character {
+      overflow: visible;
     }
 
     .beating.pulse-anime .anime-character {
@@ -905,21 +910,21 @@
           <div class="setting-group">
             <span class="setting-group__label">Scale</span>
             <div class="setting-group__row">
-              <input type="range" id="animeScaleSlider" min="30" max="200" value="100" step="5" />
+              <input type="range" id="animeScaleSlider" min="30" max="1000" value="100" step="5" />
               <span class="setting-group__value" id="animeScaleValue">100%</span>
             </div>
           </div>
           <div class="setting-group">
             <span class="setting-group__label">Offset X</span>
             <div class="setting-group__row">
-              <input type="range" id="animeOffsetXSlider" min="-100" max="100" value="0" step="1" />
+              <input type="range" id="animeOffsetXSlider" min="-500" max="500" value="0" step="1" />
               <span class="setting-group__value" id="animeOffsetXValue">0</span>
             </div>
           </div>
           <div class="setting-group">
             <span class="setting-group__label">Offset Y</span>
             <div class="setting-group__row">
-              <input type="range" id="animeOffsetYSlider" min="-100" max="100" value="0" step="1" />
+              <input type="range" id="animeOffsetYSlider" min="-500" max="500" value="0" step="1" />
               <span class="setting-group__value" id="animeOffsetYValue">0</span>
             </div>
           </div>
