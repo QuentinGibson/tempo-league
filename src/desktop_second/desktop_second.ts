@@ -31,6 +31,8 @@ class DesktopSecond extends AppWindow {
 	private _animeOffsetYSlider: HTMLInputElement;
 	private _animeOffsetYValue: HTMLElement;
 	private _animeCharacter: HTMLElement;
+	private _settingsToggle: HTMLElement;
+	private _settingsPanel: HTMLElement;
 
 	private constructor() {
 		super(kWindowNames.desktopSecond);
@@ -62,6 +64,8 @@ class DesktopSecond extends AppWindow {
 		this._animeOffsetXValue = document.getElementById("animeOffsetXValue");
 		this._animeOffsetYSlider = document.getElementById("animeOffsetYSlider") as HTMLInputElement;
 		this._animeOffsetYValue = document.getElementById("animeOffsetYValue");
+		this._settingsToggle = document.getElementById("settingsToggle");
+		this._settingsPanel = document.getElementById("settingsPanel");
 	}
 
 	public static instance() {
@@ -84,8 +88,12 @@ class DesktopSecond extends AppWindow {
 
 		// Listen for champion changes from the desktop window
 		window.addEventListener("storage", (e: StorageEvent) => {
-			if (e.key === "tempo_champion" && e.newValue) {
-				this.onChampionData(e.newValue);
+			if (e.key === "tempo_champion") {
+				if (e.newValue) {
+					this.onChampionData(e.newValue);
+				} else {
+					this.clearChampion();
+				}
 			}
 		});
 	}
@@ -121,6 +129,15 @@ class DesktopSecond extends AppWindow {
 		this._orbWrap.classList.add("beating");
 	}
 
+	private clearChampion() {
+		this._bpmValue.textContent = "—";
+		this._champName.textContent = "—";
+		this._asValue.textContent = "—";
+		this._readout.classList.add("hidden");
+		this._waitingState.classList.remove("hidden");
+		this._orbWrap.classList.remove("beating");
+	}
+
 	private initSettings() {
 		const saved = localStorage.getItem("tempo_settings");
 		if (saved) {
@@ -138,6 +155,12 @@ class DesktopSecond extends AppWindow {
 				console.error("Failed to load settings:", e);
 			}
 		}
+
+		// Settings toggle button
+		this._settingsToggle.addEventListener("click", () => {
+			this._settingsPanel.classList.toggle("hidden");
+			this._settingsToggle.classList.toggle("active");
+		});
 
 		// Style toggles
 		this._styleToggles.addEventListener("click", (e: Event) => {

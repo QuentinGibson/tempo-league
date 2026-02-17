@@ -89,6 +89,8 @@ class BackgroundController {
       this._windows[kWindowNames.desktop].restore();
       this._windows[kWindowNames.desktopSecond].restore();
       this._windows[kWindowNames.inGame].close();
+      // Clear BPM data when game ends
+      localStorage.removeItem("tempo_champion");
     }
   }
 

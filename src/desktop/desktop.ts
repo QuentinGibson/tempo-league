@@ -55,6 +55,8 @@ class Desktop extends AppWindow {
 
 	private onInfoUpdates(info) {
 		if (!info.info?.champ_select?.raw) {
+			// Champ select data cleared — user left lobby
+			localStorage.removeItem("tempo_champion");
 			return;
 		}
 

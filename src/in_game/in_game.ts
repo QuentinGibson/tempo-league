@@ -93,6 +93,15 @@ class InGame extends AppWindow {
 			return false;
 		});
 		this.logLine(this._eventsLog, e, shouldHighlight);
+
+		// Clear BPM data when match ends
+		const matchEnded = e.events.some(
+			(event) => event.name === "matchEnd" || event.name === "match_end",
+		);
+		if (matchEnded) {
+			this._lastWrittenAS = 0;
+			localStorage.removeItem("tempo_champion");
+		}
 	}
 
 	// Displays the toggle minimize/restore hotkey in the window header
