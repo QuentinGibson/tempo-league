@@ -23,6 +23,7 @@ class BackgroundController {
   private constructor() {
     // Populating the background controller's window dictionary
     this._windows[kWindowNames.desktop] = new OWWindow(kWindowNames.desktop);
+    this._windows[kWindowNames.desktopSecond] = new OWWindow(kWindowNames.desktopSecond);
     this._windows[kWindowNames.inGame] = new OWWindow(kWindowNames.inGame);
 
     // When a a supported game game is started or is ended, toggle the app's windows
@@ -66,9 +67,11 @@ class BackgroundController {
 
     if (await this.isSupportedGameRunning()) {
       this._windows[kWindowNames.desktop].close();
+      this._windows[kWindowNames.desktopSecond].close();
       this._windows[kWindowNames.inGame].restore();
     } else {
       this._windows[kWindowNames.desktop].restore();
+      this._windows[kWindowNames.desktopSecond].restore();
       this._windows[kWindowNames.inGame].close();
     }
   }
@@ -80,9 +83,11 @@ class BackgroundController {
 
     if (info.isRunning) {
       this._windows[kWindowNames.desktop].close();
+      this._windows[kWindowNames.desktopSecond].close();
       this._windows[kWindowNames.inGame].restore();
     } else {
       this._windows[kWindowNames.desktop].restore();
+      this._windows[kWindowNames.desktopSecond].restore();
       this._windows[kWindowNames.inGame].close();
     }
   }

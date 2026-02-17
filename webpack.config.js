@@ -11,6 +11,7 @@ module.exports = env => ({
     entry: {
         background: './src/background/background.ts',
         desktop: './src/desktop/desktop.ts',
+        desktop_second: './src/desktop_second/desktop_second.ts',
         in_game: './src/in_game/in_game.ts'
     },
     devtool: 'inline-source-map',
@@ -44,6 +45,11 @@ module.exports = env => ({
             template: './src/desktop/desktop.html',
             filename: path.resolve(buildPath, 'desktop.html'),
             chunks: ['desktop']
+        }),
+        new HtmlWebpackPlugin({
+            template: './src/desktop_second/desktop_second.html',
+            filename: path.resolve(buildPath, 'desktop_second.html'),
+            chunks: ['desktop_second']
         }),
         new HtmlWebpackPlugin({
             template: './src/in_game/in_game.html',

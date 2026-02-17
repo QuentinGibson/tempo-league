@@ -255,7 +255,8 @@ export const kLauncherClassId = 10902;
 
 export const kWindowNames = {
   inGame: 'in_game',
-  desktop: 'desktop'
+  desktop: 'desktop',
+  desktopSecond: 'desktop_second'
 };
 
 export const kHotkeys = {
