@@ -18,9 +18,13 @@
       --text-primary: #e8e6f0;
       --text-muted: #5a586a;
       --text-dim: #3a3848;
-      --ring-idle: rgba(232, 54, 79, 0.06);
-      --ring-pulse: rgba(232, 54, 79, 0.25);
+      --ring-idle: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.06);
+      --ring-pulse: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.25);
+      --accent-r: 232;
+      --accent-g: 54;
+      --accent-b: 79;
       --beat-duration: 1s;
+      --pulse-scale: 1.12;
     }
 
     body {
@@ -145,8 +149,8 @@
         var(--accent-dim) 100%
       );
       box-shadow:
-        0 0 60px rgba(232, 54, 79, 0.15),
-        0 0 120px rgba(232, 54, 79, 0.05),
+        0 0 60px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15),
+        0 0 120px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.05),
         inset 0 -8px 24px rgba(0, 0, 0, 0.4);
       position: relative;
       z-index: 2;
@@ -170,24 +174,24 @@
 
     @keyframes orb-pulse {
       0%   {
-        transform: scale(1.12);
+        transform: scale(var(--pulse-scale));
         box-shadow:
-          0 0 80px rgba(232, 54, 79, 0.4),
-          0 0 160px rgba(232, 54, 79, 0.15),
+          0 0 80px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4),
+          0 0 160px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15),
           inset 0 -8px 24px rgba(0, 0, 0, 0.4);
       }
       15%  {
         transform: scale(1.0);
         box-shadow:
-          0 0 60px rgba(232, 54, 79, 0.2),
-          0 0 120px rgba(232, 54, 79, 0.06),
+          0 0 60px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.2),
+          0 0 120px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.06),
           inset 0 -8px 24px rgba(0, 0, 0, 0.4);
       }
       100% {
         transform: scale(1.0);
         box-shadow:
-          0 0 60px rgba(232, 54, 79, 0.15),
-          0 0 120px rgba(232, 54, 79, 0.05),
+          0 0 60px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15),
+          0 0 120px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.05),
           inset 0 -8px 24px rgba(0, 0, 0, 0.4);
       }
     }
@@ -311,6 +315,303 @@
       background: var(--text-muted);
     }
 
+    /* ---- Anime pulse type ---- */
+    .tempo-orb-wrap.pulse-anime .ring,
+    .tempo-orb-wrap.pulse-anime .tick-ring,
+    .tempo-orb-wrap.pulse-anime .orb::before {
+      display: none;
+    }
+
+    .tempo-orb-wrap.pulse-anime .orb {
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 50%,
+        var(--accent-glow) 0%,
+        var(--accent-core) 30%,
+        transparent 70%
+      );
+      box-shadow:
+        0 0 40px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3),
+        inset 0 0 30px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.2);
+    }
+
+    /* Shockwave rings */
+    .shockwave {
+      position: absolute;
+      border-radius: 50%;
+      border: 2px solid var(--accent-core);
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .beating.pulse-anime .shockwave--1 {
+      animation: shockwave-expand var(--beat-duration) ease-out infinite;
+    }
+    .beating.pulse-anime .shockwave--2 {
+      animation: shockwave-expand var(--beat-duration) ease-out infinite;
+      animation-delay: 0.06s;
+    }
+    .beating.pulse-anime .shockwave--3 {
+      animation: shockwave-expand var(--beat-duration) ease-out infinite;
+      animation-delay: 0.12s;
+    }
+
+    @keyframes shockwave-expand {
+      0%   { transform: scale(1); opacity: 0.8; border-color: var(--accent-glow); }
+      40%  { transform: scale(2.2); opacity: 0; border-color: var(--accent-core); }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    /* Speed lines */
+    .speed-lines {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .speed-line {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 2px;
+      height: 0;
+      background: linear-gradient(to top, transparent, var(--accent-glow));
+      opacity: 0;
+      transform-origin: bottom center;
+    }
+
+    .beating.pulse-anime .speed-line {
+      animation: speed-line-burst var(--beat-duration) ease-out infinite;
+    }
+
+    @keyframes speed-line-burst {
+      0%   { height: 20px; opacity: 0.9; transform: translateX(-50%) translateY(-120%) rotate(var(--line-angle)); }
+      30%  { height: 60px; opacity: 0; transform: translateX(-50%) translateY(-200%) rotate(var(--line-angle)); }
+      100% { height: 60px; opacity: 0; transform: translateX(-50%) translateY(-200%) rotate(var(--line-angle)); }
+    }
+
+    /* Anime flash — sharp cross flare */
+    .anime-flash {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .anime-flash::before,
+    .anime-flash::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(to bottom, transparent, var(--accent-glow) 40%, var(--accent-glow) 60%, transparent);
+    }
+
+    .anime-flash::before {
+      width: 3px;
+      height: 120%;
+    }
+
+    .anime-flash::after {
+      width: 120%;
+      height: 3px;
+      background: linear-gradient(to right, transparent, var(--accent-glow) 40%, var(--accent-glow) 60%, transparent);
+    }
+
+    .beating.pulse-anime .anime-flash {
+      animation: cross-flare var(--beat-duration) ease-out infinite;
+    }
+
+    @keyframes cross-flare {
+      0%   { opacity: 1; transform: scale(1.3); }
+      15%  { opacity: 0.3; transform: scale(1); }
+      30%  { opacity: 0; transform: scale(0.8); }
+      100% { opacity: 0; }
+    }
+
+    /* Anime orb pulse override */
+    .beating.pulse-anime .orb {
+      animation: anime-orb-pulse var(--beat-duration) ease-out infinite;
+    }
+
+    @keyframes anime-orb-pulse {
+      0%   {
+        transform: scale(var(--pulse-scale));
+        box-shadow:
+          0 0 80px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.6),
+          0 0 160px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3),
+          inset 0 0 30px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3);
+        filter: brightness(1.4);
+      }
+      10% {
+        transform: scale(0.95);
+        filter: brightness(1);
+      }
+      20%  {
+        transform: scale(1.0);
+        box-shadow:
+          0 0 40px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3),
+          inset 0 0 30px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.2);
+        filter: brightness(1);
+      }
+      100% {
+        transform: scale(1.0);
+        box-shadow:
+          0 0 40px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3),
+          inset 0 0 30px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.2);
+        filter: brightness(1);
+      }
+    }
+
+    /* Hide anime elements by default */
+    .shockwave, .speed-lines, .anime-flash {
+      display: none;
+    }
+    .pulse-anime .shockwave,
+    .pulse-anime .speed-lines,
+    .pulse-anime .anime-flash {
+      display: block;
+    }
+
+    /* ---- Settings panel (bottom-left) ---- */
+    .settings-panel {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: var(--bg-surface);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
+      padding: 16px 20px;
+      width: 220px;
+    }
+
+    .settings-panel__title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin: 0 0 4px 0;
+    }
+
+    .setting-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .setting-group__label {
+      font-size: 12px;
+      font-weight: 300;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    .setting-group__row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .setting-group__value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-dim);
+      min-width: 32px;
+      text-align: right;
+    }
+
+    /* Style toggles */
+    .style-toggles {
+      display: flex;
+      gap: 6px;
+    }
+
+    .style-toggle {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-dim);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 4px;
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      outline: none;
+    }
+
+    .style-toggle:hover {
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .style-toggle.active {
+      color: var(--text-primary);
+      background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15);
+      border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3);
+    }
+
+    /* Color swatches */
+    .color-swatches {
+      display: flex;
+      gap: 6px;
+    }
+
+    .color-swatch {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: border-color 0.15s ease, transform 0.15s ease;
+      padding: 0;
+      outline: none;
+    }
+
+    .color-swatch:hover {
+      transform: scale(1.15);
+    }
+
+    .color-swatch.active {
+      border-color: var(--text-primary);
+    }
+
+    /* Range slider */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.08);
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: var(--text-primary);
+    }
+
     /* ---- Utility ---- */
     .hidden { display: none !important; }
   </style>
@@ -338,6 +639,12 @@
         <div class="ring ring--2"></div>
         <div class="ring ring--3"></div>
         <div class="orb" id="orb"></div>
+        <!-- Anime pulse elements -->
+        <div class="shockwave shockwave--1"></div>
+        <div class="shockwave shockwave--2"></div>
+        <div class="shockwave shockwave--3"></div>
+        <div class="speed-lines" id="speedLines"></div>
+        <div class="anime-flash"></div>
       </div>
 
       <!-- Active: show BPM data -->
@@ -363,7 +670,48 @@
       </div>
     </div>
 
-    <!-- Ad space -->
+    <!-- Settings (bottom-left) -->
+    <div class="settings-panel" id="settingsPanel">
+      <span class="settings-panel__title">customize</span>
+
+      <div class="setting-group">
+        <span class="setting-group__label">Style</span>
+        <div class="style-toggles" id="styleToggles">
+          <button class="style-toggle active" data-style="orb">Orb</button>
+          <button class="style-toggle" data-style="anime">Anime</button>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <span class="setting-group__label">Color</span>
+        <div class="color-swatches" id="colorSwatches">
+          <button class="color-swatch active" data-core="#e8364f" data-glow="#ff4d6a" data-dim="#7a1d2e" style="background:#e8364f" title="Crimson"></button>
+          <button class="color-swatch" data-core="#3b82f6" data-glow="#60a5fa" data-dim="#1e3a5f" style="background:#3b82f6" title="Blue"></button>
+          <button class="color-swatch" data-core="#10b981" data-glow="#34d399" data-dim="#064e3b" style="background:#10b981" title="Emerald"></button>
+          <button class="color-swatch" data-core="#f59e0b" data-glow="#fbbf24" data-dim="#78350f" style="background:#f59e0b" title="Amber"></button>
+          <button class="color-swatch" data-core="#a855f7" data-glow="#c084fc" data-dim="#581c87" style="background:#a855f7" title="Purple"></button>
+          <button class="color-swatch" data-core="#e8e6f0" data-glow="#ffffff" data-dim="#6b6b7a" style="background:#e8e6f0" title="White"></button>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <span class="setting-group__label">Size</span>
+        <div class="setting-group__row">
+          <input type="range" id="sizeSlider" min="80" max="240" value="160" step="10" />
+          <span class="setting-group__value" id="sizeValue">160</span>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <span class="setting-group__label">Pulse intensity</span>
+        <div class="setting-group__row">
+          <input type="range" id="intensitySlider" min="2" max="30" value="12" step="1" />
+          <span class="setting-group__value" id="intensityValue">12%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ad space (bottom-right) -->
     <div class="ad-section">
       <div class="ad-container" id="ad-container"></div>
       <span class="ad-label">sponsored</span>
@@ -401,13 +749,27 @@
     (function () {
       const ring = document.getElementById('tickRing');
       const count = 60;
-      for (let i = 0; i < count; i++) {
-        const tick = document.createElement('div');
-        const angle = (360 / count) * i;
-        const isMajor = i % 15 === 0;
+      for (var i = 0; i < count; i++) {
+        var tick = document.createElement('div');
+        var angle = (360 / count) * i;
+        var isMajor = i % 15 === 0;
         tick.className = 'tick' + (isMajor ? ' tick--major' : '');
         tick.style.transform = 'rotate(' + angle + 'deg)';
         ring.appendChild(tick);
+      }
+    })();
+
+    // Generate speed lines for anime pulse
+    (function () {
+      var container = document.getElementById('speedLines');
+      var lineCount = 12;
+      for (var i = 0; i < lineCount; i++) {
+        var line = document.createElement('div');
+        line.className = 'speed-line';
+        var angle = (360 / lineCount) * i;
+        line.style.setProperty('--line-angle', angle + 'deg');
+        line.style.animationDelay = (i * 0.015) + 's';
+        container.appendChild(line);
       }
     })();
   </script>
