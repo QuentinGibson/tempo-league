@@ -512,6 +512,38 @@
       letter-spacing: 2px;
     }
 
+    /* ---- Ad container ---- */
+    .ad-section {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      animation: fade-up 0.8s ease-out 0.9s both;
+    }
+
+    .ad-container {
+      width: 400px;
+      height: 300px;
+      background: var(--bg-surface);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .ad-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 300;
+      color: var(--text-dim);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-right: 4px;
+    }
+
     /* ---- Hidden debug logs ---- */
     .debug-logs {
       display: none;
@@ -629,6 +661,11 @@
       </div>
     </div>
 
+    <!-- Ad space (bottom-right) -->
+    <div class="ad-section">
+      <div class="ad-container" id="ad-container"></div>
+    </div>
+
     <!-- Footer -->
     <div class="app-footer">
       <span class="app-footer__text">tempo league v1.0</span>
@@ -640,6 +677,34 @@
       <div id="infoLog"></div>
     </div>
   </main>
+
+  <script src="https://content.overwolf.com/libs/ads/latest/owads.min.js" async onerror="onAdsSDKNotLoaded()"
+    onload="onAdsSDKReady()"></script>
+  <script>
+    function onAdsSDKNotLoaded() {
+      console.error("Couldn't load owads.min.js");
+    }
+
+    function onAdsSDKReady() {
+      if (typeof OwAd === 'undefined') {
+        console.error("Overwolf Ads SDK not available");
+        return;
+      }
+
+      var ad = new OwAd(document.getElementById("ad-container"), {
+        size: {width: 400, height: 300},
+        containerId: "tempo_league_400x300_desktop"
+      });
+
+      ad.addEventListener("player_loaded", function () {
+        console.log("Ad player loaded");
+      });
+
+      ad.addEventListener("error", function (e) {
+        console.error("Ad error:", e);
+      });
+    }
+  </script>
 </body>
 
 </html>

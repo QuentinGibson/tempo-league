@@ -82,16 +82,16 @@
         "in_game_only": true,
         "focus_game_takeover": "ReleaseOnHidden",
         "focus_game_takeover_release_hotkey": "sample_app_ts_showhide",
-        "resizable": true,
+        "resizable": false,
         "transparent": true,
         "override_on_update": true,
         "size": {
-          "width": 1212,
-          "height": 699
+          "width": 360,
+          "height": 90
         },
         "min_size": {
-          "width": 1212,
-          "height": 699
+          "width": 360,
+          "height": 90
         }
       }
     },

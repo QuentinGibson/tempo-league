@@ -16,11 +16,21 @@ class InGame extends AppWindow {
 	private _eventsLog: HTMLElement;
 	private _infoLog: HTMLElement;
 
+	// HUD elements
+	private _hudWaiting: HTMLElement;
+	private _hudData: HTMLElement;
+	private _hudBpmValue: HTMLElement;
+	private _hudAsValue: HTMLElement;
+
 	private constructor() {
 		super(kWindowNames.inGame);
 
 		this._eventsLog = document.getElementById("eventsLog");
 		this._infoLog = document.getElementById("infoLog");
+		this._hudWaiting = document.getElementById("hudWaiting");
+		this._hudData = document.getElementById("hudData");
+		this._hudBpmValue = document.getElementById("hudBpmValue");
+		this._hudAsValue = document.getElementById("hudAsValue");
 
 		this.setToggleHotkeyBehavior();
 		this.setToggleHotkeyText();
@@ -63,6 +73,13 @@ class InGame extends AppWindow {
 			const as = activePlayer.championStats.attackSpeed;
 			this.logLine(this._infoLog, as, false);
 
+			// Update HUD display
+			const bpm = Math.round(as * 60);
+			this._hudBpmValue.textContent = String(bpm);
+			this._hudAsValue.textContent = as.toFixed(3);
+			this._hudWaiting.classList.add("hidden");
+			this._hudData.classList.add("visible");
+
 			// Write to localStorage for desktop_second to consume
 			// Throttle: only write if attack speed changed by > 0.01
 			if (Math.abs(as - this._lastWrittenAS) > 0.01) {
@@ -101,6 +118,8 @@ class InGame extends AppWindow {
 		if (matchEnded) {
 			this._lastWrittenAS = 0;
 			localStorage.removeItem("tempo_champion");
+			this._hudData.classList.remove("visible");
+			this._hudWaiting.classList.remove("hidden");
 		}
 	}
 

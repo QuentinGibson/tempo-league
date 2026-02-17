@@ -1,72 +1,340 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <link rel="stylesheet" href="../../css/general.css" />
   <link rel="stylesheet" href="../../css/header.css" />
-  <link rel="stylesheet" href="../../css/ingame.css" />
-  <link rel="stylesheet" href="../../css/modal.css" />
-  <title>Overwolf Sample App - In-Game page</title>
-</head>
-<body class="in-game">
-  <!-- -------------------------------- Header ------------------------------- -->
+  <title>Tempo League - In Game</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
 
-  <header id="header" class="app-header">
-    <img src="../../img/header_icon.svg" />
-    <h1>Sample App / in-game window</h1>
-    <h1 class="hotkey-text">
-      Show/Hide Hotkey:
-      <kbd id="hotkey"></kbd>
-    </h1>
+    :root {
+      --bg-glass: rgba(10, 10, 15, 0.75);
+      --bg-glass-solid: rgba(10, 10, 15, 0.92);
+      --accent-core: #e8364f;
+      --accent-glow: #ff4d6a;
+      --accent-dim: #7a1d2e;
+      --text-primary: #e8e6f0;
+      --text-muted: #5a586a;
+      --text-dim: #3a3848;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      font-family: 'Outfit', sans-serif;
+      overflow: hidden;
+    }
+
+    /* ---- Compact header ---- */
+    .app-header {
+      flex-shrink: 0;
+    }
+
+    .tempo-header {
+      padding: 0 2px 0 10px;
+      height: 28px;
+      background: var(--bg-glass-solid);
+      border-bottom: 1px solid rgba(232, 54, 79, 0.1);
+    }
+
+    .tempo-header__brand {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tempo-header__logo {
+      width: 18px;
+      height: 18px;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    .tempo-header__text {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .tempo-header__title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: #e8e6f0;
+      letter-spacing: 2px;
+      cursor: inherit;
+    }
+
+    .tempo-header__subtitle {
+      font-family: 'Outfit', sans-serif;
+      font-size: 8px;
+      font-weight: 300;
+      color: #5a586a;
+      letter-spacing: 3px;
+      cursor: inherit;
+    }
+
+    .tempo-header__tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 7px;
+      font-weight: 500;
+      color: var(--accent-core);
+      background: rgba(232, 54, 79, 0.1);
+      border: 1px solid rgba(232, 54, 79, 0.2);
+      border-radius: 2px;
+      padding: 0px 3px;
+      letter-spacing: 1px;
+      cursor: inherit;
+    }
+
+    .window-control:before {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* ---- HUD body ---- */
+    .hud {
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-top: none;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      animation: hud-enter 0.4s ease-out both;
+    }
+
+    @keyframes hud-enter {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ---- Accent bar left edge ---- */
+    .hud::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--accent-core), transparent);
+      border-radius: 0 0 0 6px;
+    }
+
+    /* ---- BPM readout ---- */
+    .hud__bpm-group {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .hud__bpm-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1;
+      letter-spacing: -1px;
+      min-width: 48px;
+    }
+
+    .hud__bpm-unit {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 300;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ---- Divider ---- */
+    .hud__divider {
+      width: 1px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.06);
+      flex-shrink: 0;
+    }
+
+    /* ---- AS readout ---- */
+    .hud__as-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .hud__as-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--accent-glow);
+      line-height: 1;
+    }
+
+    .hud__as-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8px;
+      font-weight: 300;
+      color: var(--text-dim);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ---- Pulse dot ---- */
+    .hud__pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-core);
+      box-shadow: 0 0 6px rgba(232, 54, 79, 0.5);
+      flex-shrink: 0;
+      animation: hud-dot-pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes hud-dot-pulse {
+      0%, 100% {
+        opacity: 1;
+        box-shadow: 0 0 6px rgba(232, 54, 79, 0.5);
+      }
+      50% {
+        opacity: 0.4;
+        box-shadow: 0 0 3px rgba(232, 54, 79, 0.2);
+      }
+    }
+
+    /* ---- Hotkey hint ---- */
+    .hud__hotkey {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .hud__hotkey-label {
+      font-size: 9px;
+      font-weight: 300;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+    }
+
+    .hud__hotkey-key {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 3px;
+      padding: 2px 6px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ---- Waiting state ---- */
+    .hud__waiting {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 300;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+    }
+
+    .dot-pulse {
+      display: inline-block;
+      animation: dot-blink 1.4s infinite steps(1);
+    }
+
+    .dot-pulse:nth-child(2) { animation-delay: 0.2s; }
+    .dot-pulse:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes dot-blink {
+      0%, 50% { opacity: 0; }
+      25% { opacity: 1; }
+    }
+
+    /* ---- State visibility ---- */
+    .hud__data {
+      display: none;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .hud__data.visible {
+      display: flex;
+    }
+
+    .hud__waiting.hidden {
+      display: none;
+    }
+
+    /* ---- Hidden debug logs ---- */
+    .debug-logs {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ---- Compact header ---- -->
+  <header id="header" class="app-header tempo-header">
+    <div class="tempo-header__brand">
+      <img src="../../img/tempo_logo.svg" class="tempo-header__logo" />
+      <div class="tempo-header__text">
+        <span class="tempo-header__title">TEMPO</span>
+        <span class="tempo-header__subtitle">LEAGUE</span>
+      </div>
+      <span class="tempo-header__tag">BPM</span>
+    </div>
     <div class="window-controls-group">
-      <button id="minimizeButton" class="window-control window-control-minimize" />
-      <button id="maximizeButton" class="window-control window-control-maximize" />
-      <button id="closeButton" class="window-control window-control-close" />
+      <button id="minimizeButton" class="window-control window-control-minimize"></button>
+      <button id="maximizeButton" class="window-control window-control-maximize"></button>
+      <button id="closeButton" class="window-control window-control-close"></button>
     </div>
   </header>
 
-  <!-- --------------------------------- Main -------------------------------- -->
-  <main>
-    <div id="logs">
-      <div id="events" class="logColumn">
-        <h1>Game Events</h1>
-        <div id="eventsLog" class="dataText">
-        </div>
+  <!-- ---- HUD strip ---- -->
+  <div class="hud">
+    <!-- Waiting state -->
+    <span class="hud__waiting" id="hudWaiting">
+      reading attack speed<span class="dot-pulse">.</span><span class="dot-pulse">.</span><span class="dot-pulse">.</span>
+    </span>
+
+    <!-- Data state -->
+    <div class="hud__data" id="hudData">
+      <div class="hud__pulse-dot" id="hudPulseDot"></div>
+      <div class="hud__bpm-group">
+        <span class="hud__bpm-value" id="hudBpmValue">—</span>
+        <span class="hud__bpm-unit">bpm</span>
       </div>
-      <div id="infoUpdates" class="logColumn">
-        <h1>Info Updates</h1>
-        <div id="infoLog" class="dataText"></div>
+      <div class="hud__divider"></div>
+      <div class="hud__as-group">
+        <span class="hud__as-value" id="hudAsValue">—</span>
+        <span class="hud__as-label">AS</span>
       </div>
     </div>
-    <div id="other">
-      <h1>Real-time Game Data</h1>
-      <p id="infoParagraph">
-        The background controller of this app is listening to all the game
-        events and info updates, and sends them to this window, that prints
-        them to the screen. Some specific events (Match Start/End, Kill and
-        Death) are painted in <span style="color: #00DEFA">teal</span> and
-        logged to the developers console.
-      </p>
+
+    <div class="hud__hotkey">
+      <span class="hud__hotkey-label">toggle</span>
+      <kbd class="hud__hotkey-key" id="hotkey">—</kbd>
     </div>
-  </main>
+  </div>
 
-  <script>
-    // Standard Google Universal Analytics code
-    (function (i, s, o, g, r, a, m) {
-      i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
-        (i[r].q = i[r].q || []).push(arguments)
-      },
-        i[r].l = 1 * new Date(); a = s.createElement(o),
-          m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
-      // Note: https protocol here
-    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
-
-    ga('create', 'UA-144253676-3', 'auto');
-
-    // Removes failing protocol check. @see: http://stackoverflow.com/a/22152353/1958200
-    ga('set', 'checkProtocolTask', function () { });
-    ga('require', 'displayfeatures');
-    ga('send', 'pageview', '/in_game.html');
-  </script>
+  <!-- Hidden debug logs (required by in_game.ts) -->
+  <div class="debug-logs">
+    <div id="eventsLog"></div>
+    <div id="infoLog"></div>
+  </div>
 </body>
+
 </html>
