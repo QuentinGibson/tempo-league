@@ -16,7 +16,24 @@ class DesktopSecond extends AppWindow {
 		return DesktopSecond._instance;
 	}
 
-	public async run() {}
+	public async run() {
+		overwolf.utils.getMonitorsList((result) => {
+			if (!result.displays || result.displays.length < 2) {
+				return;
+			}
+
+			const secondMonitor = result.displays.find((d) => !d.is_primary);
+			if (!secondMonitor) {
+				return;
+			}
+
+			overwolf.windows.changePosition(
+				kWindowNames.desktopSecond,
+				secondMonitor.x,
+				secondMonitor.y
+			);
+		});
+	}
 }
 
 DesktopSecond.instance().run();
