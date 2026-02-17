@@ -42,6 +42,65 @@
       flex-shrink: 0;
     }
 
+    /* ---- Custom Tempo header ---- */
+    .tempo-header {
+      padding: 0 4px 0 12px;
+      height: 38px;
+      background: linear-gradient(to right, #0f0f16, #1a1a24 40%, #0f0f16);
+      border-bottom: 1px solid rgba(232, 54, 79, 0.08);
+    }
+
+    .tempo-header__brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tempo-header__logo {
+      width: 24px;
+      height: 24px;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    .tempo-header__text {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+    }
+
+    .tempo-header__title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: #e8e6f0;
+      letter-spacing: 3px;
+      cursor: inherit;
+    }
+
+    .tempo-header__subtitle {
+      font-family: 'Outfit', sans-serif;
+      font-size: 10px;
+      font-weight: 300;
+      color: #5a586a;
+      letter-spacing: 4px;
+      cursor: inherit;
+    }
+
+    .tempo-header__tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8px;
+      font-weight: 500;
+      color: var(--accent-core);
+      background: rgba(232, 54, 79, 0.1);
+      border: 1px solid rgba(232, 54, 79, 0.2);
+      border-radius: 3px;
+      padding: 1px 4px;
+      letter-spacing: 1px;
+      margin-left: 2px;
+      cursor: inherit;
+    }
+
     main {
       flex: 1;
       display: flex;
@@ -121,21 +180,48 @@
       transition: border-color 0.3s ease;
     }
 
-    .ring--1 { width: 320px; height: 320px; }
-    .ring--2 { width: 270px; height: 270px; }
-    .ring--3 { width: 220px; height: 220px; }
+    .ring--1 {
+      width: 320px;
+      height: 320px;
+    }
+
+    .ring--2 {
+      width: 270px;
+      height: 270px;
+    }
+
+    .ring--3 {
+      width: 220px;
+      height: 220px;
+    }
 
     .beating .ring {
       animation: ring-breathe var(--beat-duration) ease-out infinite;
     }
 
-    .beating .ring--2 { animation-delay: 0.04s; }
-    .beating .ring--3 { animation-delay: 0.08s; }
+    .beating .ring--2 {
+      animation-delay: 0.04s;
+    }
+
+    .beating .ring--3 {
+      animation-delay: 0.08s;
+    }
 
     @keyframes ring-breathe {
-      0%   { border-color: var(--ring-pulse); transform: scale(1.03); }
-      30%  { border-color: var(--ring-idle); transform: scale(1); }
-      100% { border-color: var(--ring-idle); transform: scale(1); }
+      0% {
+        border-color: var(--ring-pulse);
+        transform: scale(1.03);
+      }
+
+      30% {
+        border-color: var(--ring-idle);
+        transform: scale(1);
+      }
+
+      100% {
+        border-color: var(--ring-idle);
+        transform: scale(1);
+      }
     }
 
     /* ---- Core orb ---- */
@@ -144,10 +230,9 @@
       height: 160px;
       border-radius: 50%;
       background: radial-gradient(circle at 40% 35%,
-        var(--accent-glow) 0%,
-        var(--accent-core) 40%,
-        var(--accent-dim) 100%
-      );
+          var(--accent-glow) 0%,
+          var(--accent-core) 40%,
+          var(--accent-dim) 100%);
       box-shadow:
         0 0 60px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15),
         0 0 120px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.05),
@@ -165,7 +250,7 @@
       width: 36%;
       height: 28%;
       border-radius: 50%;
-      background: radial-gradient(ellipse, rgba(255,255,255,0.25) 0%, transparent 70%);
+      background: radial-gradient(ellipse, rgba(255, 255, 255, 0.25) 0%, transparent 70%);
     }
 
     .beating .orb {
@@ -173,20 +258,22 @@
     }
 
     @keyframes orb-pulse {
-      0%   {
+      0% {
         transform: scale(var(--pulse-scale));
         box-shadow:
           0 0 80px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4),
           0 0 160px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15),
           inset 0 -8px 24px rgba(0, 0, 0, 0.4);
       }
-      15%  {
+
+      15% {
         transform: scale(1.0);
         box-shadow:
           0 0 60px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.2),
           0 0 120px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.06),
           inset 0 -8px 24px rgba(0, 0, 0, 0.4);
       }
+
       100% {
         transform: scale(1.0);
         box-shadow:
@@ -202,7 +289,7 @@
       position: absolute;
       inset: 0;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%);
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
       opacity: 0;
     }
 
@@ -211,9 +298,17 @@
     }
 
     @keyframes orb-flash {
-      0%   { opacity: 1; }
-      20%  { opacity: 0; }
-      100% { opacity: 0; }
+      0% {
+        opacity: 1;
+      }
+
+      20% {
+        opacity: 0;
+      }
+
+      100% {
+        opacity: 0;
+      }
     }
 
     /* ---- Data readout ---- */
@@ -282,12 +377,25 @@
       display: inline-block;
       animation: dot-blink 1.4s infinite steps(1);
     }
-    .waiting-state .dot-pulse:nth-child(2) { animation-delay: 0.2s; }
-    .waiting-state .dot-pulse:nth-child(3) { animation-delay: 0.4s; }
+
+    .waiting-state .dot-pulse:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .waiting-state .dot-pulse:nth-child(3) {
+      animation-delay: 0.4s;
+    }
 
     @keyframes dot-blink {
-      0%, 50% { opacity: 0; }
-      25%     { opacity: 1; }
+
+      0%,
+      50% {
+        opacity: 0;
+      }
+
+      25% {
+        opacity: 1;
+      }
     }
 
     /* ---- Tick markers around orb ---- */
@@ -325,10 +433,9 @@
     .tempo-orb-wrap.pulse-radiate .orb {
       border-radius: 50%;
       background: radial-gradient(circle at 50% 50%,
-        var(--accent-glow) 0%,
-        var(--accent-core) 30%,
-        transparent 70%
-      );
+          var(--accent-glow) 0%,
+          var(--accent-core) 30%,
+          transparent 70%);
       box-shadow:
         0 0 40px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3),
         inset 0 0 30px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.2);
@@ -348,19 +455,34 @@
     .beating.pulse-radiate .shockwave--1 {
       animation: shockwave-expand var(--beat-duration) ease-out infinite;
     }
+
     .beating.pulse-radiate .shockwave--2 {
       animation: shockwave-expand var(--beat-duration) ease-out infinite;
       animation-delay: 0.06s;
     }
+
     .beating.pulse-radiate .shockwave--3 {
       animation: shockwave-expand var(--beat-duration) ease-out infinite;
       animation-delay: 0.12s;
     }
 
     @keyframes shockwave-expand {
-      0%   { transform: scale(1); opacity: 0.8; border-color: var(--accent-glow); }
-      40%  { transform: scale(2.2); opacity: 0; border-color: var(--accent-core); }
-      100% { transform: scale(2.2); opacity: 0; }
+      0% {
+        transform: scale(1);
+        opacity: 0.8;
+        border-color: var(--accent-glow);
+      }
+
+      40% {
+        transform: scale(2.2);
+        opacity: 0;
+        border-color: var(--accent-core);
+      }
+
+      100% {
+        transform: scale(2.2);
+        opacity: 0;
+      }
     }
 
     /* Speed lines */
@@ -387,9 +509,23 @@
     }
 
     @keyframes speed-line-burst {
-      0%   { height: 20px; opacity: 0.9; transform: translateX(-50%) translateY(-120%) rotate(var(--line-angle)); }
-      30%  { height: 60px; opacity: 0; transform: translateX(-50%) translateY(-200%) rotate(var(--line-angle)); }
-      100% { height: 60px; opacity: 0; transform: translateX(-50%) translateY(-200%) rotate(var(--line-angle)); }
+      0% {
+        height: 20px;
+        opacity: 0.9;
+        transform: translateX(-50%) translateY(-120%) rotate(var(--line-angle));
+      }
+
+      30% {
+        height: 60px;
+        opacity: 0;
+        transform: translateX(-50%) translateY(-200%) rotate(var(--line-angle));
+      }
+
+      100% {
+        height: 60px;
+        opacity: 0;
+        transform: translateX(-50%) translateY(-200%) rotate(var(--line-angle));
+      }
     }
 
     /* Anime flash — sharp cross flare */
@@ -427,10 +563,24 @@
     }
 
     @keyframes cross-flare {
-      0%   { opacity: 1; transform: scale(1.3); }
-      15%  { opacity: 0.3; transform: scale(1); }
-      30%  { opacity: 0; transform: scale(0.8); }
-      100% { opacity: 0; }
+      0% {
+        opacity: 1;
+        transform: scale(1.3);
+      }
+
+      15% {
+        opacity: 0.3;
+        transform: scale(1);
+      }
+
+      30% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+
+      100% {
+        opacity: 0;
+      }
     }
 
     /* Anime orb pulse override */
@@ -439,7 +589,7 @@
     }
 
     @keyframes radiate-orb-pulse {
-      0%   {
+      0% {
         transform: scale(var(--pulse-scale));
         box-shadow:
           0 0 80px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.6),
@@ -447,17 +597,20 @@
           inset 0 0 30px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3);
         filter: brightness(1.4);
       }
+
       10% {
         transform: scale(0.95);
         filter: brightness(1);
       }
-      20%  {
+
+      20% {
         transform: scale(1.0);
         box-shadow:
           0 0 40px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3),
           inset 0 0 30px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.2);
         filter: brightness(1);
       }
+
       100% {
         transform: scale(1.0);
         box-shadow:
@@ -468,9 +621,12 @@
     }
 
     /* Hide radiate/anime elements by default */
-    .shockwave, .speed-lines, .radiate-flash {
+    .shockwave,
+    .speed-lines,
+    .radiate-flash {
       display: none;
     }
+
     .pulse-radiate .shockwave,
     .pulse-radiate .speed-lines,
     .pulse-radiate .radiate-flash {
@@ -517,25 +673,24 @@
     }
 
     @keyframes anime-char-pulse {
-      0%   {
+      0% {
         transform: scale(var(--pulse-scale));
-        filter: drop-shadow(0 0 30px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.8))
-               brightness(1.3);
+        filter: drop-shadow(0 0 30px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.8)) brightness(1.3);
       }
-      10%  {
+
+      10% {
         transform: scale(0.97);
-        filter: drop-shadow(0 0 12px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4))
-               brightness(1);
+        filter: drop-shadow(0 0 12px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4)) brightness(1);
       }
-      25%  {
+
+      25% {
         transform: scale(1);
-        filter: drop-shadow(0 0 12px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4))
-               brightness(1);
+        filter: drop-shadow(0 0 12px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4)) brightness(1);
       }
+
       100% {
         transform: scale(1);
-        filter: drop-shadow(0 0 12px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4))
-               brightness(1);
+        filter: drop-shadow(0 0 12px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4)) brightness(1);
       }
     }
 
@@ -546,10 +701,9 @@
       height: 80%;
       border-radius: 50%;
       background: radial-gradient(circle,
-        rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15) 0%,
-        rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.05) 50%,
-        transparent 70%
-      );
+          rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15) 0%,
+          rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.05) 50%,
+          transparent 70%);
       z-index: 1;
       display: none;
     }
@@ -563,22 +717,22 @@
     }
 
     @keyframes anime-aura-pulse {
-      0%   {
+      0% {
         transform: scale(1.4);
         background: radial-gradient(circle,
-          rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.35) 0%,
-          rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15) 50%,
-          transparent 70%
-        );
+            rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.35) 0%,
+            rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15) 50%,
+            transparent 70%);
       }
-      20%  {
+
+      20% {
         transform: scale(1);
         background: radial-gradient(circle,
-          rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15) 0%,
-          rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.05) 50%,
-          transparent 70%
-        );
+            rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15) 0%,
+            rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.05) 50%,
+            transparent 70%);
       }
+
       100% {
         transform: scale(1);
       }
@@ -603,15 +757,28 @@
     .beating.pulse-anime .anime-ring--1 {
       animation: anime-ring-expand var(--beat-duration) ease-out infinite;
     }
+
     .beating.pulse-anime .anime-ring--2 {
       animation: anime-ring-expand var(--beat-duration) ease-out infinite;
       animation-delay: 0.08s;
     }
 
     @keyframes anime-ring-expand {
-      0%   { transform: scale(0.8); opacity: 0.6; border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.5); }
-      40%  { transform: scale(1.6); opacity: 0; }
-      100% { transform: scale(1.6); opacity: 0; }
+      0% {
+        transform: scale(0.8);
+        opacity: 0.6;
+        border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.5);
+      }
+
+      40% {
+        transform: scale(1.6);
+        opacity: 0;
+      }
+
+      100% {
+        transform: scale(1.6);
+        opacity: 0;
+      }
     }
 
     /* ---- Settings panel (bottom-left) ---- */
@@ -820,15 +987,23 @@
     }
 
     /* ---- Utility ---- */
-    .hidden { display: none !important; }
+    .hidden {
+      display: none !important;
+    }
   </style>
 </head>
 
 <body>
   <!-- -------------------------------- Header ------------------------------- -->
-  <header id="header" class="app-header">
-    <img src="../../img/header_icon.svg" />
-    <h1>Tempo League</h1>
+  <header id="header" class="app-header tempo-header">
+    <div class="tempo-header__brand">
+      <img src="../../img/tempo_logo.svg" class="tempo-header__logo" />
+      <div class="tempo-header__text">
+        <span class="tempo-header__title">TEMPO</span>
+        <span class="tempo-header__subtitle">LEAGUE</span>
+      </div>
+      <span class="tempo-header__tag">BPM</span>
+    </div>
     <div class="window-controls-group">
       <button id="minimizeButton" class="window-control window-control-minimize"></button>
       <button id="maximizeButton" class="window-control window-control-maximize"></button>
@@ -934,12 +1109,18 @@
       <div class="setting-group">
         <span class="setting-group__label">Color</span>
         <div class="color-swatches" id="colorSwatches">
-          <button class="color-swatch active" data-core="#e8364f" data-glow="#ff4d6a" data-dim="#7a1d2e" style="background:#e8364f" title="Crimson"></button>
-          <button class="color-swatch" data-core="#3b82f6" data-glow="#60a5fa" data-dim="#1e3a5f" style="background:#3b82f6" title="Blue"></button>
-          <button class="color-swatch" data-core="#10b981" data-glow="#34d399" data-dim="#064e3b" style="background:#10b981" title="Emerald"></button>
-          <button class="color-swatch" data-core="#f59e0b" data-glow="#fbbf24" data-dim="#78350f" style="background:#f59e0b" title="Amber"></button>
-          <button class="color-swatch" data-core="#a855f7" data-glow="#c084fc" data-dim="#581c87" style="background:#a855f7" title="Purple"></button>
-          <button class="color-swatch" data-core="#e8e6f0" data-glow="#ffffff" data-dim="#6b6b7a" style="background:#e8e6f0" title="White"></button>
+          <button class="color-swatch active" data-core="#e8364f" data-glow="#ff4d6a" data-dim="#7a1d2e"
+            style="background:#e8364f" title="Crimson"></button>
+          <button class="color-swatch" data-core="#3b82f6" data-glow="#60a5fa" data-dim="#1e3a5f"
+            style="background:#3b82f6" title="Blue"></button>
+          <button class="color-swatch" data-core="#10b981" data-glow="#34d399" data-dim="#064e3b"
+            style="background:#10b981" title="Emerald"></button>
+          <button class="color-swatch" data-core="#f59e0b" data-glow="#fbbf24" data-dim="#78350f"
+            style="background:#f59e0b" title="Amber"></button>
+          <button class="color-swatch" data-core="#a855f7" data-glow="#c084fc" data-dim="#581c87"
+            style="background:#a855f7" title="Purple"></button>
+          <button class="color-swatch" data-core="#e8e6f0" data-glow="#ffffff" data-dim="#6b6b7a"
+            style="background:#e8e6f0" title="White"></button>
         </div>
       </div>
 
@@ -963,12 +1144,11 @@
     <!-- Ad space (bottom-right) -->
     <div class="ad-section">
       <div class="ad-container" id="ad-container"></div>
-      <span class="ad-label">sponsored</span>
     </div>
   </main>
 
-  <script src="https://content.overwolf.com/libs/ads/latest/owads.min.js" async
-    onerror="onAdsSDKNotLoaded()" onload="onAdsSDKReady()"></script>
+  <script src="https://content.overwolf.com/libs/ads/latest/owads.min.js" async onerror="onAdsSDKNotLoaded()"
+    onload="onAdsSDKReady()"></script>
   <script>
     function onAdsSDKNotLoaded() {
       console.error("Couldn't load owads.min.js");
@@ -981,7 +1161,7 @@
       }
 
       var ad = new OwAd(document.getElementById("ad-container"), {
-        size: { width: 400, height: 300 },
+        size: {width: 400, height: 300},
         containerId: "tempo_league_400x300_desktop_second"
       });
 

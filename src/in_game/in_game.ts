@@ -52,13 +52,26 @@ class InGame extends AppWindow {
 		}
 	}
 
+	private _lastWrittenAS: number = 0;
+
 	private onInfoUpdates(info) {
 		if (!info.live_client_data) {
 			return;
 		}
 		const activePlayer = JSON.parse(info.live_client_data.active_player);
 		if (activePlayer?.championStats?.attackSpeed !== undefined) {
-			this.logLine(this._infoLog, activePlayer.championStats.attackSpeed, false);
+			const as = activePlayer.championStats.attackSpeed;
+			this.logLine(this._infoLog, as, false);
+
+			// Write to localStorage for desktop_second to consume
+			// Throttle: only write if attack speed changed by > 0.01
+			if (Math.abs(as - this._lastWrittenAS) > 0.01) {
+				this._lastWrittenAS = as;
+				localStorage.setItem("tempo_champion", JSON.stringify({
+					name: activePlayer.summonerName || "In Game",
+					attackSpeed: as,
+				}));
+			}
 		}
 	}
 

@@ -67,8 +67,8 @@ class BackgroundController {
 
     if (await this.isSupportedGameRunning()) {
       this._windows[kWindowNames.desktop].close();
-      this._windows[kWindowNames.desktopSecond].close();
       this._windows[kWindowNames.inGame].restore();
+      // Keep desktop_second open for real-time BPM during game
     } else {
       this._windows[kWindowNames.desktop].restore();
       this._windows[kWindowNames.desktopSecond].restore();
@@ -83,8 +83,8 @@ class BackgroundController {
 
     if (info.isRunning) {
       this._windows[kWindowNames.desktop].close();
-      this._windows[kWindowNames.desktopSecond].close();
       this._windows[kWindowNames.inGame].restore();
+      // Keep desktop_second open so BPM updates in real-time during game
     } else {
       this._windows[kWindowNames.desktop].restore();
       this._windows[kWindowNames.desktopSecond].restore();
