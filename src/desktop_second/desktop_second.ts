@@ -18,6 +18,19 @@ class DesktopSecond extends AppWindow {
 	private _intensityValue: HTMLElement;
 	private _colorSwatches: HTMLElement;
 	private _styleToggles: HTMLElement;
+	private _animeDropdown: HTMLElement;
+	private _animeDropdownToggle: HTMLElement;
+	private _animeDropdownArrow: HTMLElement;
+	private _animeDropdownBody: HTMLElement;
+	private _animeImageUrl: HTMLInputElement;
+	private _animeCharImg: HTMLImageElement;
+	private _animeScaleSlider: HTMLInputElement;
+	private _animeScaleValue: HTMLElement;
+	private _animeOffsetXSlider: HTMLInputElement;
+	private _animeOffsetXValue: HTMLElement;
+	private _animeOffsetYSlider: HTMLInputElement;
+	private _animeOffsetYValue: HTMLElement;
+	private _animeCharacter: HTMLElement;
 
 	private constructor() {
 		super(kWindowNames.desktopSecond);
@@ -36,6 +49,19 @@ class DesktopSecond extends AppWindow {
 		this._intensityValue = document.getElementById("intensityValue");
 		this._colorSwatches = document.getElementById("colorSwatches");
 		this._styleToggles = document.getElementById("styleToggles");
+		this._animeDropdown = document.getElementById("animeDropdown");
+		this._animeDropdownToggle = document.getElementById("animeDropdownToggle");
+		this._animeDropdownArrow = document.getElementById("animeDropdownArrow");
+		this._animeDropdownBody = document.getElementById("animeDropdownBody");
+		this._animeImageUrl = document.getElementById("animeImageUrl") as HTMLInputElement;
+		this._animeCharImg = document.getElementById("animeCharImg") as HTMLImageElement;
+		this._animeCharacter = document.getElementById("animeCharacter");
+		this._animeScaleSlider = document.getElementById("animeScaleSlider") as HTMLInputElement;
+		this._animeScaleValue = document.getElementById("animeScaleValue");
+		this._animeOffsetXSlider = document.getElementById("animeOffsetXSlider") as HTMLInputElement;
+		this._animeOffsetXValue = document.getElementById("animeOffsetXValue");
+		this._animeOffsetYSlider = document.getElementById("animeOffsetYSlider") as HTMLInputElement;
+		this._animeOffsetYValue = document.getElementById("animeOffsetYValue");
 	}
 
 	public static instance() {
@@ -100,6 +126,10 @@ class DesktopSecond extends AppWindow {
 		if (saved) {
 			try {
 				const s = JSON.parse(saved);
+				if (s.animeImageUrl) this.applyAnimeImage(s.animeImageUrl);
+				if (s.animeScale != null) this.applyAnimeScale(s.animeScale);
+				if (s.animeOffsetX != null) this.applyAnimeOffsetX(s.animeOffsetX);
+				if (s.animeOffsetY != null) this.applyAnimeOffsetY(s.animeOffsetY);
 				if (s.style) this.applyStyle(s.style);
 				if (s.color) this.applyColor(s.color.core, s.color.glow, s.color.dim);
 				if (s.size) this.applySize(s.size);
@@ -120,6 +150,37 @@ class DesktopSecond extends AppWindow {
 			target.classList.add("active");
 
 			this.applyStyle(target.dataset.style);
+			this.saveSettings();
+		});
+
+		// Anime dropdown toggle
+		this._animeDropdownToggle.addEventListener("click", () => {
+			this._animeDropdownBody.classList.toggle("hidden");
+			this._animeDropdownArrow.classList.toggle("open");
+		});
+
+		// Anime image URL
+		this._animeImageUrl.addEventListener("change", () => {
+			const url = this._animeImageUrl.value.trim();
+			this.applyAnimeImage(url);
+			this.saveSettings();
+		});
+
+		// Anime scale
+		this._animeScaleSlider.addEventListener("input", () => {
+			this.applyAnimeScale(parseInt(this._animeScaleSlider.value, 10));
+			this.saveSettings();
+		});
+
+		// Anime offset X
+		this._animeOffsetXSlider.addEventListener("input", () => {
+			this.applyAnimeOffsetX(parseInt(this._animeOffsetXSlider.value, 10));
+			this.saveSettings();
+		});
+
+		// Anime offset Y
+		this._animeOffsetYSlider.addEventListener("input", () => {
+			this.applyAnimeOffsetY(parseInt(this._animeOffsetYSlider.value, 10));
 			this.saveSettings();
 		});
 
@@ -156,7 +217,7 @@ class DesktopSecond extends AppWindow {
 	}
 
 	private applyStyle(style: string) {
-		this._orbWrap.classList.remove("pulse-orb", "pulse-anime");
+		this._orbWrap.classList.remove("pulse-orb", "pulse-radiate", "pulse-anime");
 		this._orbWrap.classList.add(`pulse-${style}`);
 
 		this._styleToggles
@@ -165,6 +226,42 @@ class DesktopSecond extends AppWindow {
 				const el = s as HTMLElement;
 				el.classList.toggle("active", el.dataset.style === style);
 			});
+
+		// Show character settings dropdown only for anime style
+		if (style === "anime") {
+			this._animeDropdown.classList.remove("hidden");
+		} else {
+			this._animeDropdown.classList.add("hidden");
+		}
+	}
+
+	private applyAnimeImage(url: string) {
+		this._animeImageUrl.value = url;
+		if (url) {
+			this._animeCharImg.src = url;
+		}
+	}
+
+	private applyAnimeScale(scale: number) {
+		this._animeScaleSlider.value = String(scale);
+		this._animeScaleValue.textContent = `${scale}%`;
+		this._animeCharacter.style.transform = this.getAnimeTransform(scale);
+	}
+
+	private applyAnimeOffsetX(x: number) {
+		this._animeOffsetXSlider.value = String(x);
+		this._animeOffsetXValue.textContent = String(x);
+		this._animeCharImg.style.marginLeft = `${x}px`;
+	}
+
+	private applyAnimeOffsetY(y: number) {
+		this._animeOffsetYSlider.value = String(y);
+		this._animeOffsetYValue.textContent = String(y);
+		this._animeCharImg.style.marginTop = `${y}px`;
+	}
+
+	private getAnimeTransform(scale: number): string {
+		return `scale(${scale / 100})`;
 	}
 
 	private applyColor(core: string, glow: string, dim: string) {
@@ -239,6 +336,10 @@ class DesktopSecond extends AppWindow {
 		) as HTMLElement;
 		const settings = {
 			style: activeStyle ? activeStyle.dataset.style : "orb",
+			animeImageUrl: this._animeImageUrl.value.trim(),
+			animeScale: parseInt(this._animeScaleSlider.value, 10),
+			animeOffsetX: parseInt(this._animeOffsetXSlider.value, 10),
+			animeOffsetY: parseInt(this._animeOffsetYSlider.value, 10),
 			color: activeSwatch
 				? {
 						core: activeSwatch.dataset.core,
