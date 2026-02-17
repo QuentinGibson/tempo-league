@@ -8,10 +8,10 @@
     "minimum-overwolf-version": "0.160.0",
     "description": "Convert your champion's attack speed into a visual BPM pulse on your second monitor",
     "dock_button_title": "Tempo League",
-    "icon": "icons/IconMouseOver.png",
-    "icon_gray": "icons/IconMouseNormal.png",
-    "launcher_icon": "icons/desktop-icon.ico",
-    "window_icon": "icons/IconMouseOver.png"
+    "icon": "icons/tempo_icon.png",
+    "icon_gray": "icons/tempo_icon_gray.png",
+    "launcher_icon": "icons/tempo_icon.ico",
+    "window_icon": "icons/tempo_icon.png"
   },
   "permissions": [
     "Hotkeys",

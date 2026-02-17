@@ -1,10 +1,6 @@
-import {
-  OWGames,
-  OWGameListener,
-  OWWindow
-} from '@overwolf/overwolf-api-ts';
+import { OWGameListener, OWGames, OWWindow } from "@overwolf/overwolf-api-ts";
 
-import { kWindowNames, kGameClassIds } from "../consts";
+import { kGameClassIds, kWindowNames } from "../consts";
 
 import RunningGameInfo = overwolf.games.RunningGameInfo;
 import AppLaunchTriggeredEvent = overwolf.extensions.AppLaunchTriggeredEvent;
@@ -16,94 +12,100 @@ import AppLaunchTriggeredEvent = overwolf.extensions.AppLaunchTriggeredEvent;
 // Our background controller implements the Singleton design pattern, since only one
 // instance of it should exist.
 class BackgroundController {
-  private static _instance: BackgroundController;
-  private _windows: Record<string, OWWindow> = {};
-  private _gameListener: OWGameListener;
+	private static _instance: BackgroundController;
+	private _windows: Record<string, OWWindow> = {};
+	private _gameListener: OWGameListener;
 
-  private constructor() {
-    // Populating the background controller's window dictionary
-    this._windows[kWindowNames.desktop] = new OWWindow(kWindowNames.desktop);
-    this._windows[kWindowNames.desktopSecond] = new OWWindow(kWindowNames.desktopSecond);
-    this._windows[kWindowNames.inGame] = new OWWindow(kWindowNames.inGame);
+	private constructor() {
+		// Populating the background controller's window dictionary
+		this._windows[kWindowNames.desktop] = new OWWindow(kWindowNames.desktop);
+		this._windows[kWindowNames.desktopSecond] = new OWWindow(
+			kWindowNames.desktopSecond,
+		);
+		this._windows[kWindowNames.inGame] = new OWWindow(kWindowNames.inGame);
 
-    // When a a supported game game is started or is ended, toggle the app's windows
-    this._gameListener = new OWGameListener({
-      onGameStarted: this.toggleWindows.bind(this),
-      onGameEnded: this.toggleWindows.bind(this)
-    });
+		// When a a supported game game is started or is ended, toggle the app's windows
+		this._gameListener = new OWGameListener({
+			onGameStarted: this.toggleWindows.bind(this),
+			onGameEnded: this.toggleWindows.bind(this),
+		});
 
-    overwolf.extensions.onAppLaunchTriggered.addListener(
-      e => this.onAppLaunchTriggered(e)
-    );
-  };
+		overwolf.extensions.onAppLaunchTriggered.addListener((e) =>
+			this.onAppLaunchTriggered(e),
+		);
+	}
 
-  // Implementing the Singleton design pattern
-  public static instance(): BackgroundController {
-    if (!BackgroundController._instance) {
-      BackgroundController._instance = new BackgroundController();
-    }
+	// Implementing the Singleton design pattern
+	public static instance(): BackgroundController {
+		if (!BackgroundController._instance) {
+			BackgroundController._instance = new BackgroundController();
+		}
 
-    return BackgroundController._instance;
-  }
+		return BackgroundController._instance;
+	}
 
-  // When running the app, start listening to games' status and decide which window should
-  // be launched first, based on whether a supported game is currently running
-  public async run() {
-    this._gameListener.start();
+	// When running the app, start listening to games' status and decide which window should
+	// be launched first, based on whether a supported game is currently running
+	public async run() {
+		this._gameListener.start();
 
-    const currWindowName = (await this.isSupportedGameRunning())
-      ? kWindowNames.inGame
-      : kWindowNames.desktop;
+		if (await this.isSupportedGameRunning()) {
+			this._windows[kWindowNames.inGame].restore();
+		} else {
+			this._windows[kWindowNames.desktop].restore();
+		}
 
-    this._windows[currWindowName].restore();
-  }
+		// Always open the second monitor window
+		this._windows[kWindowNames.desktopSecond].restore();
+	}
 
-  private async onAppLaunchTriggered(e: AppLaunchTriggeredEvent) {
-    console.log('onAppLaunchTriggered():', e);
+	private async onAppLaunchTriggered(e: AppLaunchTriggeredEvent) {
+		console.log("onAppLaunchTriggered():", e);
 
-    if (!e || e.origin.includes('gamelaunchevent')) {
-      return;
-    }
+		if (!e || e.origin.includes("gamelaunchevent")) {
+			return;
+		}
 
-    if (await this.isSupportedGameRunning()) {
-      this._windows[kWindowNames.desktop].close();
-      this._windows[kWindowNames.inGame].restore();
-      // Keep desktop_second open for real-time BPM during game
-    } else {
-      this._windows[kWindowNames.desktop].restore();
-      this._windows[kWindowNames.desktopSecond].restore();
-      this._windows[kWindowNames.inGame].close();
-    }
-  }
+		if (await this.isSupportedGameRunning()) {
+			this._windows[kWindowNames.desktop].close();
+			this._windows[kWindowNames.inGame].restore();
+			// Keep desktop_second open for real-time BPM during game
+		} else {
+			this._windows[kWindowNames.desktop].restore();
+			this._windows[kWindowNames.desktopSecond].restore();
+			this._windows[kWindowNames.inGame].close();
+		}
+	}
 
-  private toggleWindows(info: RunningGameInfo) {
-    if (!info || !this.isSupportedGame(info)) {
-      return;
-    }
+	private toggleWindows(info: RunningGameInfo) {
+		if (!info || !this.isSupportedGame(info)) {
+			return;
+		}
 
-    if (info.isRunning) {
-      this._windows[kWindowNames.desktop].close();
-      this._windows[kWindowNames.inGame].restore();
-      // Keep desktop_second open so BPM updates in real-time during game
-    } else {
-      this._windows[kWindowNames.desktop].restore();
-      this._windows[kWindowNames.desktopSecond].restore();
-      this._windows[kWindowNames.inGame].close();
-      // Clear BPM data when game ends
-      localStorage.removeItem("tempo_champion");
-    }
-  }
+		if (info.isRunning) {
+			this._windows[kWindowNames.desktop].close();
+			this._windows[kWindowNames.inGame].restore();
+			this._windows[kWindowNames.desktopSecond].restore();
+			this._windows[kWindowNames.desktopSecond].maximize();
+		} else {
+			this._windows[kWindowNames.desktop].restore();
+			this._windows[kWindowNames.desktopSecond].restore();
+			this._windows[kWindowNames.inGame].close();
+			// Clear BPM data when game ends
+			localStorage.removeItem("tempo_champion");
+		}
+	}
 
-  private async isSupportedGameRunning(): Promise<boolean> {
-    const info = await OWGames.getRunningGameInfo();
+	private async isSupportedGameRunning(): Promise<boolean> {
+		const info = await OWGames.getRunningGameInfo();
 
-    return info && info.isRunning && this.isSupportedGame(info);
-  }
+		return info?.isRunning && this.isSupportedGame(info);
+	}
 
-  // Identify whether the RunningGameInfo object we have references a supported game
-  private isSupportedGame(info: RunningGameInfo) {
-    return kGameClassIds.includes(info.classId);
-  }
+	// Identify whether the RunningGameInfo object we have references a supported game
+	private isSupportedGame(info: RunningGameInfo) {
+		return kGameClassIds.includes(info.classId);
+	}
 }
 
 BackgroundController.instance().run();
