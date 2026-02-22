@@ -1,7 +1,7 @@
-import { OWGames, OWGamesEvents, OWHotkeys } from "@overwolf/overwolf-api-ts";
+import { OWGames, OWHotkeys } from "@overwolf/overwolf-api-ts";
 
 import { AppWindow } from "../AppWindow";
-import { kGamesFeatures, kHotkeys, kWindowNames } from "../consts";
+import { kHotkeys, kWindowNames } from "../consts";
 
 import WindowState = overwolf.windows.WindowStateEx;
 
@@ -12,9 +12,6 @@ import WindowState = overwolf.windows.WindowStateEx;
 // Like the background window, it also implements the Singleton design pattern.
 class InGame extends AppWindow {
 	private static _instance: InGame;
-	private _gameEventsListener: OWGamesEvents;
-	private _eventsLog: HTMLElement;
-	private _infoLog: HTMLElement;
 
 	// HUD elements
 	private _hudWaiting: HTMLElement;
@@ -25,8 +22,6 @@ class InGame extends AppWindow {
 	private constructor() {
 		super(kWindowNames.inGame);
 
-		this._eventsLog = document.getElementById("eventsLog");
-		this._infoLog = document.getElementById("infoLog");
 		this._hudWaiting = document.getElementById("hudWaiting");
 		this._hudData = document.getElementById("hudData");
 		this._hudBpmValue = document.getElementById("hudBpmValue");
@@ -45,81 +40,38 @@ class InGame extends AppWindow {
 	}
 
 	public async run() {
-		const gameClassId = await this.getCurrentGameClassId();
-
-		const gameFeatures = kGamesFeatures.get(gameClassId);
-
-		if (gameFeatures?.length) {
-			this._gameEventsListener = new OWGamesEvents(
-				{
-					onInfoUpdates: this.onInfoUpdates.bind(this),
-					onNewEvents: this.onNewEvents.bind(this),
-				},
-				gameFeatures,
-			);
-
-			this._gameEventsListener.start();
+		// Check for existing data (background may have already written it)
+		const existing = localStorage.getItem("tempo_champion");
+		if (existing) {
+			this.updateHud(existing);
 		}
-	}
 
-	private _lastWrittenAS: number = 0;
-
-	private onInfoUpdates(info) {
-		if (!info.live_client_data) {
-			return;
-		}
-		const activePlayer = JSON.parse(info.live_client_data.active_player);
-		if (activePlayer?.championStats?.attackSpeed !== undefined) {
-			const as = activePlayer.championStats.attackSpeed;
-			this.logLine(this._infoLog, as, false);
-
-			// Update HUD display
-			const bpm = Math.round(as * 60);
-			this._hudBpmValue.textContent = String(bpm);
-			this._hudAsValue.textContent = as.toFixed(3);
-			this._hudWaiting.classList.add("hidden");
-			this._hudData.classList.add("visible");
-
-			// Write to localStorage for desktop_second to consume
-			// Throttle: only write if attack speed changed by > 0.01
-			if (Math.abs(as - this._lastWrittenAS) > 0.01) {
-				this._lastWrittenAS = as;
-				localStorage.setItem("tempo_champion", JSON.stringify({
-					name: activePlayer.summonerName || "In Game",
-					attackSpeed: as,
-				}));
+		// Background controller owns the game event listener and writes to localStorage.
+		// in_game window just reads from it for the HUD display.
+		window.addEventListener("storage", (e: StorageEvent) => {
+			if (e.key === "tempo_champion") {
+				if (e.newValue) {
+					this.updateHud(e.newValue);
+				} else {
+					this._hudData.classList.remove("visible");
+					this._hudWaiting.classList.remove("hidden");
+				}
 			}
-		}
-	}
-
-	// Special events will be highlighted in the event log
-	private onNewEvents(e) {
-		const shouldHighlight = e.events.some((event) => {
-			switch (event.name) {
-				case "kill":
-				case "death":
-				case "assist":
-				case "level":
-				case "matchStart":
-				case "match_start":
-				case "matchEnd":
-				case "match_end":
-					return true;
-			}
-
-			return false;
 		});
-		this.logLine(this._eventsLog, e, shouldHighlight);
+	}
 
-		// Clear BPM data when match ends
-		const matchEnded = e.events.some(
-			(event) => event.name === "matchEnd" || event.name === "match_end",
-		);
-		if (matchEnded) {
-			this._lastWrittenAS = 0;
-			localStorage.removeItem("tempo_champion");
-			this._hudData.classList.remove("visible");
-			this._hudWaiting.classList.remove("hidden");
+	private updateHud(json: string) {
+		try {
+			const data = JSON.parse(json);
+			if (data.attackSpeed !== undefined) {
+				const bpm = Math.round(data.attackSpeed * 60);
+				this._hudBpmValue.textContent = String(bpm);
+				this._hudAsValue.textContent = data.attackSpeed.toFixed(3);
+				this._hudWaiting.classList.add("hidden");
+				this._hudData.classList.add("visible");
+			}
+		} catch (err) {
+			console.error("Failed to parse champion data:", err);
 		}
 	}
 
@@ -156,26 +108,6 @@ class InGame extends AppWindow {
 		};
 
 		OWHotkeys.onHotkeyDown(kHotkeys.toggle, toggleInGameWindow);
-	}
-
-	// Appends a new line to the specified log
-	private logLine(log: HTMLElement, data, highlight) {
-		const line = document.createElement("pre");
-		line.textContent = JSON.stringify(data);
-
-		if (highlight) {
-			line.className = "highlight";
-		}
-
-		// Check if scroll is near bottom
-		const shouldAutoScroll =
-			log.scrollTop + log.offsetHeight >= log.scrollHeight - 10;
-
-		log.appendChild(line);
-
-		if (shouldAutoScroll) {
-			log.scrollTop = log.scrollHeight;
-		}
 	}
 
 	private async getCurrentGameClassId(): Promise<number | null> {

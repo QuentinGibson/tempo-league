@@ -20,7 +20,7 @@ export class AppWindow {
     this.setDrag(header);
 
     closeButton.addEventListener('click', () => {
-      this.mainWindow.close();
+      this.currWindow.close();
     });
 
     minimizeButton.addEventListener('click', () => {

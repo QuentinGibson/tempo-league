@@ -1,6 +1,6 @@
-import { OWGameListener, OWGames, OWWindow } from "@overwolf/overwolf-api-ts";
+import { OWGameListener, OWGames, OWGamesEvents, OWWindow } from "@overwolf/overwolf-api-ts";
 
-import { kGameClassIds, kWindowNames } from "../consts";
+import { kGameClassIds, kGamesFeatures, kWindowNames } from "../consts";
 
 import RunningGameInfo = overwolf.games.RunningGameInfo;
 import AppLaunchTriggeredEvent = overwolf.extensions.AppLaunchTriggeredEvent;
@@ -15,6 +15,8 @@ class BackgroundController {
 	private static _instance: BackgroundController;
 	private _windows: Record<string, OWWindow> = {};
 	private _gameListener: OWGameListener;
+	private _gameEventsListener: OWGamesEvents;
+	private _lastWrittenAS: number = 0;
 
 	private constructor() {
 		// Populating the background controller's window dictionary
@@ -51,6 +53,7 @@ class BackgroundController {
 
 		if (await this.isSupportedGameRunning()) {
 			this._windows[kWindowNames.inGame].restore();
+			this.startGameEventsListener();
 		} else {
 			this._windows[kWindowNames.desktop].restore();
 		}
@@ -87,11 +90,56 @@ class BackgroundController {
 			this._windows[kWindowNames.inGame].restore();
 			this._windows[kWindowNames.desktopSecond].restore();
 			this._windows[kWindowNames.desktopSecond].maximize();
+			this.startGameEventsListener();
 		} else {
 			this._windows[kWindowNames.desktop].restore();
 			this._windows[kWindowNames.desktopSecond].restore();
 			this._windows[kWindowNames.inGame].close();
-			// Clear BPM data when game ends
+			this._lastWrittenAS = 0;
+			localStorage.removeItem("tempo_champion");
+		}
+	}
+
+	private async startGameEventsListener() {
+		const info = await OWGames.getRunningGameInfo();
+		if (!info?.isRunning) return;
+
+		const gameFeatures = kGamesFeatures.get(info.classId);
+		if (!gameFeatures?.length) return;
+
+		this._gameEventsListener = new OWGamesEvents(
+			{
+				onInfoUpdates: this.onGameInfoUpdates.bind(this),
+				onNewEvents: this.onGameNewEvents.bind(this),
+			},
+			gameFeatures,
+		);
+		this._gameEventsListener.start();
+	}
+
+	private onGameInfoUpdates(info) {
+		if (!info.live_client_data) return;
+		try {
+			const activePlayer = JSON.parse(info.live_client_data.active_player);
+			const as = activePlayer?.championStats?.attackSpeed;
+			if (as !== undefined && Math.abs(as - this._lastWrittenAS) > 0.01) {
+				this._lastWrittenAS = as;
+				localStorage.setItem(
+					"tempo_champion",
+					JSON.stringify({ name: activePlayer.summonerName || "In Game", attackSpeed: as }),
+				);
+			}
+		} catch (e) {
+			console.error("Failed to parse live_client_data:", e);
+		}
+	}
+
+	private onGameNewEvents(e) {
+		const matchEnded = e.events.some(
+			(event) => event.name === "matchEnd" || event.name === "match_end",
+		);
+		if (matchEnded) {
+			this._lastWrittenAS = 0;
 			localStorage.removeItem("tempo_champion");
 		}
 	}
